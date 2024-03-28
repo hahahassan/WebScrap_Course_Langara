@@ -1,0 +1,409 @@
+var submitcount=0;
+function checkSubmit() {
+   if (submitcount == 0)
+   {
+      submitcount++;
+      return true;
+   }
+   else
+   {
+      alert("Your changes have already been submitted.");
+      return false;
+   }
+}
+
+function gotoNewURL(new_url)
+{
+	window.location.href=new_url;
+}
+
+function openPrt(url_to_print)
+{
+	url_to_print=document
+	print(url_to_print)
+}
+
+function backwards() 
+{
+	history.go(-1);
+}
+
+function windowOpen(new_window_url)
+{
+	var helpWin = window.open(new_window_url,'','toolbar=yes,status=no,scrollbars=yes,menubar=yes,resizable=yes,directories=no,location=no,width=800,height=600');
+}
+
+function newUrlOnDropDown()
+{
+	var URL = document.DropDown.places.options[document.DropDown.places.selectedIndex].value;
+	window.location.href = URL;
+}
+
+function makeview_win1()
+{
+	remote=window.open("","remotewin1", "width=300,height=340");
+	remote.location.href = "http://www.langara.bc.ca/cs/login.html";
+    if (remote.opener == null)
+	    remote.opener = window;
+}
+
+// ----------------------------------------------------------------------
+// to go to the selected page in the nav bar list box
+// ----------------------------------------------------------------------
+function formHandler(form)
+{
+    var URL = document.master.places.options[document.master.places.selectedIndex].value;
+    window.location.href = URL;
+}
+
+function confirmSubmit(rg_btn)
+{
+  var msg      = new String("");
+  var msg_reg  = new String("You are dropping the following REGISTERED course(s):\n");
+  var msg_wt   = new String("You are dropping the following WAITLISTED course(s):\n");
+  var wt_drop  = false;
+  var reg_drop = false;
+
+  for (var i = 0; i < rg_btn.form.RSTS_IN.length; i++)
+  {
+    if (rg_btn.form.RSTS_IN[i].length > 0)
+    {
+      if(rg_btn.form.RSTS_IN[i].options[rg_btn.form.RSTS_IN[i].selectedIndex].value.charAt(0) == "D")
+      {
+	if(rg_btn.form.RSTS_IN[i].options[rg_btn.form.RSTS_IN[i].selectedIndex].value.charAt(1) == "W")
+	{
+      	  wt_drop = true;
+          msg_wt  = msg_wt.concat( rg_btn.form.SUBJ[i].value, " ",
+                                   rg_btn.form.CRSE[i].value, "  Sec ",
+                                   rg_btn.form.SEC[i].value, "\n" );
+        }
+        else
+	{
+          reg_drop = true;
+          msg_reg  = msg_reg.concat( rg_btn.form.SUBJ[i].value, " ",
+                                     rg_btn.form.CRSE[i].value, "  Sec ",
+                                     rg_btn.form.SEC[i].value, "\n" );
+	}
+      }
+    }
+  }
+  if (reg_drop)
+     msg += msg_reg + "\n";
+ 
+  if (wt_drop)
+     msg += msg_wt + "\n";
+
+  if ( wt_drop || reg_drop )
+     return confirm(msg.concat("Is this correct?"));
+  else return true;
+}
+
+// Timer variables for countdown timer
+//
+// NOTE: Requires the <DIV id="timer_element">   <DIV> in the document and a settimeout in a body onload handler.
+var time;
+var time_rem;
+var first_call = "Y";
+
+function setTimerCount(seconds_rem)
+{
+	time_rem = seconds_rem;
+	var tmp = seconds_rem;
+	
+
+	var days = Math.floor(seconds_rem / 86400);
+	tmp = tmp - (days * 86400);
+	var hours = Math.floor(tmp / 3600);
+	tmp = tmp - (hours * 3600);
+	var minutes = Math.floor(tmp / 60);
+	tmp = tmp - (minutes * 60);
+	var seconds = tmp;
+
+	if (hours == 0)
+	{
+		hours = "00";
+	}
+
+	if (minutes == 0)
+	{
+		minutes = "00";
+	}
+	else if (minutes < 10)
+	{
+		minutes = "0" + minutes;
+	}
+
+	if (seconds == 0)
+	{
+		seconds = "00";
+	}
+	else if (seconds < 10)
+	{
+		seconds = "0" + seconds;
+	}
+
+	document.getElementById("timer_element").innerHTML = "<B>" + days + " days " + hours + " hours " + minutes + " minutes</B>";
+
+	if (first_call == "N")
+	{
+		if (seconds_rem >= 60)
+		{
+			time_rem = time_rem - 60;
+			time = setTimeout('setTimerCount(' + time_rem + ')', 60000);
+		}
+		else
+		{
+			time_rem = 0;
+			time = setTimeout('setTimerCount(0)',1);
+		}
+	}
+	else
+	{
+		first_call = "N";
+		time = setTimeout('setTimerCount(' + time_rem + ')', 60000);
+	}
+	return true;
+}
+
+function timeCon(regd, cond)
+{
+	var str = "You have a time conflict registering for " + cond + "\nIf you wish to  register for this course:\n\n";
+	str = str + "1. Drop CRN " + regd + "\n2. Enter " + cond + " in the Add Courses Worksheet\n";
+	str = str + "3. Click 'Submit Transactions'\n";
+	return alert(str);
+}
+
+// This is the onchange function for the drop down selection boxes.
+// parameters:
+//   file      - is the program that will return the values for outsel
+//   file_parm - the parameter name expected by <file> for the value selected in <insel>
+//   form_name - id of the form the insel and outsel listboxes are located in
+//               In HTML source, assign formOpen with an ID and name attribute of <form_name>
+//               e.g., htp.FormOpen(..., cattributes=>'id="<form_name>" name="<form_name>");
+//   insel     - the id of the listbox whose value selected will determine the values in outsel listbox.
+//               In HTML source, assign the listbox with an id attribute of <insel>
+//               e.g., htp.FormSelectOpen(..., cattributes=>'id="<insel>" onchange="RefreshListBox(...); return false"');
+//   outsel    - the id of the listobx whose values will be determined by the value selected in insel
+//               In HTML source, assign the listbox with an id attribute of <outsel>
+//               e.g., htp.FormSelectOpen(..., cattributes=>'id="<outsel>"');
+//   x         - the xth occurrence of insel and outsel pair.  Starts from 0.
+//               This is to support multiple pairs of insel and outsel listboxes on the same page.
+//   mode        'SINGLE' or 'MULTIPLE'.  This tells the function whether you have a single pair or multiple pairs
+//               of listboxes.  'MULTIPLE' will cause the function to use reference the listbox IDs as an array.
+// example of what the xml output should look like:
+//   <?xml version="1.0" encoding="UTF-8"?>
+//   <root>
+//   <list_count>3</list_count>
+//   <list_value>NONE</list_value>
+//   <list_desc>None</list_term_desc>
+//   <list_value>CODE1</list_value>
+//   <list_desc>Description 1</list_term_desc>
+//   <list_value>CODE2</list_value>
+//   <list_desc>Description 2</list_term_desc>
+//   </root>
+function RefreshList(file, file_parm, form_name, insel, outsel, x, mode){
+
+  // local variable declarations.
+  var xmlObj = null;
+  var oparm = null;
+  var sel = null;
+  // Get the right kind of XML Request object based on browser.
+  if(window.XMLHttpRequest)
+  {
+     xmlObj = new XMLHttpRequest();
+  }
+  else if(window.ActiveXObject)
+  {
+     xmlObj = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  else
+  {
+     // Can't get an XML Request object - incompatible browser... bail.
+     return;
+  }
+ 
+  // Override onreadystatechange function on object xmlObj
+  // fires when the oject changes state. 
+  // example: is instantiated, finished loading, etc...
+  xmlObj.onreadystatechange = function()
+  {
+    // local variable declarations.
+    var count = 0;
+    var txt, desc;
+
+    // 4 is the readyState when the object has finised loading the data.
+    // could use the other states for progress indicator on longer AJAX calls.
+    if(xmlObj.readyState == 4)
+    {
+       
+       // find out how many terms. It's in the response.
+       count = xmlObj.responseXML.getElementsByTagName('list_count')[0].firstChild.data;
+       // clear the selection box that we will fill.
+       if (mode == 'SINGLE')
+       {
+          eval('document.forms[form_name].' + outsel + '.options.length = 0');
+       }
+       else
+       {
+          eval('document.forms[form_name].' + outsel + '[x].options.length = 0');
+       }
+       // loop through the terms.
+       for (var i =0;i < count ;i++ )
+       {
+          // get the selection box value and display value.
+          txt = xmlObj.responseXML.getElementsByTagName('list_value')[i].firstChild.data;
+          desc = xmlObj.responseXML.getElementsByTagName('list_desc')[i].firstChild.data;
+          // create a new selection item in the selection box.
+          if (mode == 'SINGLE')
+          {
+             eval('document.forms[form_name].' + outsel + '.options[i] = new Option(desc, txt)');
+          }
+          else
+          {
+          eval('document.forms[form_name].' + outsel + '[x].options[i] = new Option(desc, txt)');
+          }
+       }
+       if (count == 0)
+       {
+           if (mode == 'SINGLE')
+           {
+              eval('document.forms[form_name].' + outsel + '.options[i] = new Option("None", "NONE")');
+           }
+           else
+           {
+              eval('document.forms[form_name].' + outsel + '[x].options[i] = new Option("None", "NONE")');
+           }
+       }
+    }
+  }
+    // despite appearances this code only executes once..
+    // get the input selection box
+    if (mode == 'SINGLE')
+    {
+       sel = eval('document.forms[form_name].' + insel);
+    }
+    else
+    {
+    sel = eval('document.forms[form_name].' + insel + '[x]');
+    }
+    // pass the selection box value to the xml procedure. (file)
+    xmlObj.open ('GET', file + '?' + file_parm + '=' + sel.options[sel.selectedIndex].value, true);
+    // send it.
+    xmlObj.send ('');
+}
+
+// This is the onchange function for the program selection boxes.
+// To return data within a pair of matching comment tags found in a source file
+// and insert the the data inside div tags on the page.
+// file     = the name of a file (e.g., txt, html) or a procedure
+// out_div  = the div tag pair where data is to be placed inside of.
+// cont_tag = the comment tags from the source file where data is located.
+ function GetDivData(file, out_div, cont_tag){
+
+  // local variable declarations.
+  var xmlObj = null;
+  var oparm = null;
+  var sel = null;
+
+  // Get the right kind of XML Request object based on browser.
+  if(window.XMLHttpRequest)
+  {
+     xmlObj = new XMLHttpRequest();
+  }
+  else if(window.ActiveXObject)
+  {
+     xmlObj = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  else
+  {
+     return;
+  }
+ 
+  // Override onreadystatechange function on object xmlObj
+  // fires when the oject changes state. 
+  // example: is instantiated, finished loading, etc...
+  xmlObj.onreadystatechange = function(){
+    // local variable declarations.
+    var count = 0;
+    var content;
+
+    var start_tag = "<!-- "+cont_tag+" -->";
+    var end_tag = "<!-- /"+cont_tag+" -->";
+
+    var stag_len = start_tag.length;
+    var etag_len = end_tag.length;
+
+    var html_str= '';
+    var div_obj;
+    // 4 is the readyState when the object has finised loading the data.
+    // could use the other states for progress indicator on longer AJAX calls.
+    if(xmlObj.readyState == 4)
+    {
+       content = xmlObj.responseText.substr(xmlObj.responseText.indexOf(start_tag) + stag_len, xmlObj.responseText.indexOf(end_tag) - (xmlObj.responseText.indexOf(start_tag)+stag_len));
+       eval('document.getElementById("' + out_div + '").innerHTML=content');
+    }
+  }
+
+ // despite appearances this code only executes once..
+ // get the input selection box
+ // pass the selection box value to the xml procedure. (file)
+  xmlObj.open ('GET', file, true);
+  // send it.
+  xmlObj.send ('');
+}
+
+// Used to switch between two views encapsulated within <div id=""> tags.
+// When ViewOn is displayed, ViewOff is hidden
+function Toggle2Views(ViewOn, ViewOff)
+{
+var ViewOnStyle = document.getElementById(ViewOn).style;
+var ViewOffStyle = document.getElementById(ViewOff).style;
+
+ViewOnStyle.display = ViewOnStyle.display? "":"block";
+ViewOffStyle.display = ViewOffStyle.display? "":"none";
+}
+
+// Character counter
+// This function will count the number of characters in TextEntryField and
+// display the number in the CntDispField
+//
+function textCounter(TextEntryField,CntDispField,maxlimit) {
+var TxtObj = document.getElementById(TextEntryField);
+var CntObj = document.getElementById(CntDispField);
+var TxtLen = TxtObj.value.length;
+if (TxtLen > maxlimit) // if too long...trim it!
+   TxtObj.value = TxtObj.value.substring(0, maxlimit);
+// otherwise, update 'characters left' counter
+else
+  CntObj.value = TxtLen;
+}
+
+// Word Counter
+// This function will count the number of words in TextEntryField and 
+// display the number in the WordCntDispField.
+// If a string exceeds the maxlimit word count,
+// then a message will be displayed in WordCntMsgField
+//
+function WordCounter(TextEntryField, WordCntDispField, WordCntMsgField, maxlimit) {
+var TxtObj = document.getElementById(TextEntryField);
+var CntObj = document.getElementById(WordCntDispField);
+var CntMsgObj = document.getElementById(WordCntMsgField);
+var WordLen = TxtObj.value.split(/\s+/g).length;
+if (WordLen > maxlimit)  // if too long...show message!
+   CntMsgObj.innerHTML = "<b><font class=\"RedText\">Text is too long</font></b>";
+else
+   CntMsgObj.innerHTML = "";
+CntObj.value = WordLen;
+}
+
+function hzskwlst_ShowAlerts(conf_ind, offer_ind)
+{
+   var wl_msg = 'Accessing this page confirms your intent to remain on all of your course waitlists.  If you want to be removed from a waitlist for a particular course, please drop the course using the "Register (Add/Drop) Courses" page.';
+   var of_msg = 'You currently have an offer to register.  You must register for this course using the "Register (Add/Drop) Courses" page before the time indicated.';
+
+   if (conf_ind)
+      alert(wl_msg);
+
+   if (offer_ind)
+      alert(of_msg);
+}
